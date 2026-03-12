@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Онлайн-скрининг психического здоровья</title>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F2EFE9;--card:#FDFCFA;--brd:#E2DDD5;
+  --txt:#1A2332;--sec:#6B7280;
+  --acc:#3B6EA5;--adk:#2C5380;
+  --green:#2D7D46;--gbg:#EAF5EE;
+  --yellow:#C07C1A;--ybg:#FEF6E4;
+  --orange:#C25B1C;--obg:#FEF0E6;
+  --red:#B52C2C;--rbg:#FDEAEA;
+  --sh:0 2px 12px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04);
+  --shlg:0 8px 28px rgba(0,0,0,.11),0 2px 8px rgba(0,0,0,.06);
+  --r:14px;--rs:8px;
+}
+html,body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);font-size:16px;line-height:1.6}
+
+/* ── SCREENS ── */
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn .3s ease both}
+#scr-load.active{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@keyframes slideQ{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes barIn{from{width:0%}}
+
+/* ── HEADER ── */
+.hdr{background:var(--card);border-bottom:1px solid var(--brd);padding:12px 26px;
+  display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:20}
+.logo{border:2px dashed var(--acc);border-radius:var(--rs);padding:5px 11px;
+  font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;flex-shrink:0}
+.hdr-t{font-size:13px;font-weight:500;color:var(--sec);flex:1}
+
+/* ── BUTTONS ── */
+.btn-ghost{background:none;border:1.5px solid var(--brd);color:var(--sec);padding:6px 12px;
+  font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;border-radius:var(--rs);
+  transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-ghost:hover{border-color:var(--acc);color:var(--acc)}
+.btn-primary{background:var(--acc);color:#fff;border:none;border-radius:var(--rs);
+  padding:13px 20px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;
+  transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn-primary:hover{background:var(--adk)}
+.btn-secondary{background:var(--card);color:var(--txt);border:2px solid var(--brd);
+  border-radius:var(--rs);padding:11px 20px;font-size:15px;font-weight:500;font-family:inherit;
+  cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn-secondary:hover{border-color:var(--acc);color:var(--acc)}
+.btn-danger{background:none;color:var(--red);border:1.5px solid rgba(181,44,44,.3);
+  border-radius:var(--rs);padding:10px 18px;font-size:13.5px;font-family:inherit;cursor:pointer;
+  transition:all .15s;width:100%;text-align:center}
+.btn-danger:hover{background:var(--rbg);border-color:var(--red)}
+
+/* ── COLOR UTILS ── */
+.c-g{color:var(--green)}.c-y{color:var(--yellow)}.c-o{color:var(--orange)}.c-r{color:var(--red)}
+.bg-g{background:var(--gbg);border-color:rgba(45,125,70,.25)}
+.bg-y{background:var(--ybg);border-color:rgba(192,124,26,.25)}
+.bg-o{background:var(--obg);border-color:rgba(194,91,28,.25)}
+.bg-r{background:var(--rbg);border-color:rgba(181,44,44,.25)}
+.ba-g{background:var(--gbg);color:var(--green)}
+.ba-y{background:var(--ybg);color:var(--yellow)}
+.ba-o{background:var(--obg);color:var(--orange)}
+.ba-r{background:var(--rbg);color:var(--red)}
+.f-g{background:var(--green)}.f-y{background:var(--yellow)}.f-o{background:var(--orange)}.f-r{background:var(--red)}
+.d-g{background:var(--green)}.d-y{background:var(--yellow)}.d-o{background:var(--orange)}.d-r{background:var(--red)}
+.bdr-g{border-color:var(--green)!important}.bdr-y{border-color:var(--yellow)!important}
+.bdr-o{border-color:var(--orange)!important}.bdr-r{border-color:var(--red)!important}
+
+/* ══ SCREEN 1 — HOME ══ */
+.home-wrap{max-width:980px;margin:0 auto;padding:44px 22px 160px}
+.hero{text-align:center;margin-bottom:44px}
+.hero h1{font-family:'Spectral',serif;font-size:clamp(24px,5vw,38px);font-weight:700;line-height:1.2;margin-bottom:10px}
+.hero p{font-size:16px;color:var(--sec);max-width:480px;margin:0 auto;line-height:1.7}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:15px}
+
+.tc{background:var(--card);border:2px solid var(--brd);border-radius:var(--r);
+  padding:22px 18px;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;
+  box-shadow:var(--sh);position:relative;overflow:hidden;outline:none;display:flex;flex-direction:column}
+.tc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--acc);transform:scaleX(0);transition:transform .2s;transform-origin:left}
+.tc:hover:not(.done)::before{transform:scaleX(1)}
+.tc:hover:not(.done){transform:translateY(-3px);box-shadow:var(--shlg);border-color:var(--acc)}
+.tc.done{cursor:default}.tc.done::before{transform:scaleX(1)}
+.tc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.tc-icon{font-size:27px;line-height:1}
+.tc-redo{background:none;border:1px solid var(--brd);border-radius:6px;padding:3px 8px;
+  font-size:11px;font-weight:600;color:var(--sec);cursor:pointer;font-family:inherit;
+  display:none;transition:all .14s}
+.tc.done .tc-redo{display:block}
+.tc-redo:hover{border-color:var(--acc);color:var(--acc)}
+.tc-name{font-family:'Spectral',serif;font-size:17px;font-weight:700;margin-bottom:2px}
+.tc-full{font-size:10.5px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.tc-desc{font-size:13px;color:var(--sec);line-height:1.5;margin-bottom:8px;flex:1}
+.tc-meta{font-size:11.5px;color:var(--sec)}
+.tc-inlay{margin-top:12px;padding-top:12px;border-top:1px solid var(--brd);display:none}
+.tc.done .tc-inlay{display:block}
+.inlay-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+.inlay-sc{font-family:'Spectral',serif;font-size:24px;font-weight:700;line-height:1}
+.inlay-mx{font-size:11.5px;color:var(--sec)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:100px;font-size:11.5px;font-weight:600}
+.bdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.inlay-int{font-size:12px;color:var(--sec);line-height:1.4;margin-bottom:6px}
+.btrack{height:4px;background:var(--brd);border-radius:2px;overflow:hidden}
+.bfill{height:100%;border-radius:2px;animation:barIn .7s .1s ease both}
+
+/* ── SUMMARY BAR ── */
+#sbar{position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:var(--card);border-top:1.5px solid var(--brd);
+  box-shadow:0 -4px 18px rgba(0,0,0,.1);padding:12px 20px;
+  display:none;align-items:center;gap:14px;flex-wrap:wrap}
+#sbar.on{display:flex;animation:fadeIn .25s ease}
+.spills{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+.spill{padding:4px 10px;border-radius:100px;font-size:11.5px;font-weight:600;
+  display:inline-flex;align-items:center;gap:4px}
+.spilld{width:5px;height:5px;border-radius:50%}
+
+/* ══ SCREEN 2 — TEST ══ */
+.pbar{height:4px;background:var(--brd);position:sticky;top:57px;z-index:9}
+.pbar-f{height:100%;background:var(--acc);transition:width .4s cubic-bezier(.4,0,.2,1)}
+.thdr{background:var(--card);border-bottom:1px solid var(--brd);padding:12px 20px;
+  display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.thn{font-family:'Spectral',serif;font-size:15px;font-weight:700;line-height:1.2}
+.thp{font-size:12px;color:var(--sec);margin-top:1px}
+.qwrap{max-width:620px;margin:0 auto;padding:40px 22px 100px}
+.qwrap.aq{animation:slideQ .25s ease both}
+.q-instr{font-size:13px;color:var(--sec);background:rgba(59,110,165,.07);
+  border-left:3px solid var(--acc);border-radius:0 var(--rs) var(--rs) 0;
+  padding:10px 14px;margin-bottom:22px;line-height:1.5}
+.q-part{font-size:10px;font-weight:700;color:var(--sec);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.q-num{font-size:10.5px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.q-txt{font-family:'Spectral',serif;font-size:clamp(17px,3vw,21px);font-weight:600;
+  line-height:1.45;margin-bottom:26px;color:var(--txt)}
+.rev-tag{font-size:11px;color:var(--acc);background:rgba(59,110,165,.09);padding:2px 7px;
+  border-radius:100px;display:inline-block;margin-left:7px;vertical-align:middle}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.opts.bin{flex-direction:row}
+.opts.bin .opt{flex:1;justify-content:center;font-size:15px;font-weight:600}
+.opt{background:var(--card);border:2px solid var(--brd);border-radius:var(--rs);
+  padding:12px 15px;cursor:pointer;font-family:inherit;font-size:15px;color:var(--txt);
+  transition:border-color .13s,background .13s;display:flex;align-items:center;gap:10px;
+  width:100%;box-shadow:var(--sh);text-align:left;-webkit-tap-highlight-color:transparent}
+.opt:hover{border-color:var(--acc);background:rgba(59,110,165,.04)}
+.opt.sel{border-color:var(--acc);background:rgba(59,110,165,.09);color:var(--adk);font-weight:500}
+.odot{width:17px;height:17px;border-radius:50%;border:2px solid var(--brd);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:all .13s}
+.opt.sel .odot{border-color:var(--acc);background:var(--acc)}
+.opt.sel .odot::after{content:'';width:6px;height:6px;background:#fff;border-radius:50%}
+.btn-next{background:var(--acc);color:#fff;border:none;border-radius:var(--rs);
+  padding:14px 24px;width:100%;font-size:15.5px;font-weight:600;font-family:inherit;
+  cursor:pointer;transition:background .15s;opacity:.35;pointer-events:none}
+.btn-next.on{opacity:1;pointer-events:all}
+.btn-next.on:hover{background:var(--adk)}
+
+/* ══ SCREEN 3 — LOADING ══ */
+#scr-load{background:var(--bg)}
+.spinner{width:46px;height:46px;border:3px solid var(--brd);border-top-color:var(--acc);
+  border-radius:50%;animation:spin .8s linear infinite}
+.ltxt{font-family:'Spectral',serif;font-size:17px;color:var(--sec)}
+
+/* ══ SCREEN 4 — RESULT ══ */
+.rwrap{max-width:620px;margin:0 auto;padding:38px 22px 80px}
+.r-name{font-family:'Spectral',serif;font-size:23px;font-weight:700;margin-bottom:4px}
+.r-date{font-size:13px;color:var(--sec);margin-bottom:22px}
+.score-card{background:var(--card);border:2px solid var(--brd);border-radius:var(--r);padding:24px;margin-bottom:14px;box-shadow:var(--sh)}
+.score-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--sec);margin-bottom:5px}
+.score-big{font-family:'Spectral',serif;font-size:46px;font-weight:700;line-height:1;margin-bottom:14px}
+.score-big span{font-size:18px;color:var(--sec)}
+.bar-t{height:6px;background:var(--brd);border-radius:3px;overflow:hidden;margin-bottom:5px}
+.bar-f{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bar-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--sec)}
+.sev-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:100px;font-size:13px;font-weight:600;margin-top:12px}
+.sev-dot{width:7px;height:7px;border-radius:50%}
+.interp-card{border-radius:var(--r);padding:17px 20px;margin-bottom:12px;border:2px solid transparent}
+.interp-card h3{font-family:'Spectral',serif;font-size:15px;font-weight:700;margin-bottom:6px}
+.interp-card p{font-size:14px;line-height:1.65}
+.rec-card{background:rgba(59,110,165,.07);border:2px solid rgba(59,110,165,.18);
+  border-radius:var(--r);padding:15px 18px;margin-bottom:20px;font-size:14px;line-height:1.6}
+.rec-card strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--acc);margin-bottom:4px;font-weight:700}
+.act-col{display:flex;flex-direction:column;gap:9px}
+
+/* ══ SCREEN 5 — SUMMARY ══ */
+#scr-sum{background:var(--bg)}
+.sum-wrap{max-width:800px;margin:0 auto;padding:36px 22px 60px}
+.sum-title{font-family:'Spectral',serif;font-size:26px;font-weight:700;margin-bottom:4px}
+.sum-date{font-size:13px;color:var(--sec);margin-bottom:28px}
+
+/* Summary cards grid */
+.sum-cards{display:flex;flex-direction:column;gap:13px;margin-bottom:30px}
+.sum-card{background:var(--card);border:2px solid var(--brd);border-radius:var(--r);
+  padding:20px 22px;box-shadow:var(--sh);display:grid;
+  grid-template-columns:36px 1fr 80px;gap:14px;align-items:start;position:relative}
+.sum-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px;border-radius:var(--r) 0 0 var(--r)}
+.sum-card.bdr-g::before{background:var(--green)}
+.sum-card.bdr-y::before{background:var(--yellow)}
+.sum-card.bdr-o::before{background:var(--orange)}
+.sum-card.bdr-r::before{background:var(--red)}
+.sum-icon{font-size:24px;padding-top:2px}
+.sum-name{font-family:'Spectral',serif;font-size:16px;font-weight:700;margin-bottom:1px}
+.sum-full{font-size:11px;color:var(--sec);margin-bottom:8px}
+.sum-interp{font-size:13px;color:var(--sec);line-height:1.45;margin-top:7px}
+.sum-rec{font-size:12px;color:var(--sec);margin-top:5px;padding-left:9px;border-left:2px solid var(--brd);line-height:1.4}
+.sum-right{text-align:right}
+.sum-sc{font-family:'Spectral',serif;font-size:30px;font-weight:700;line-height:1}
+.sum-mx{font-size:11px;color:var(--sec);margin-bottom:5px}
+.sum-btrack{height:4px;background:var(--brd);border-radius:2px;overflow:hidden;margin-top:6px}
+
+/* Screenshot hint bar */
+.ss-hint{
+  background:var(--card);border:1.5px solid var(--brd);border-radius:var(--r);
+  padding:16px 20px;margin-bottom:28px;
+  display:flex;align-items:flex-start;gap:14px;
+}
+.ss-hint-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.ss-hint-body strong{display:block;font-size:13px;font-weight:700;color:var(--txt);margin-bottom:4px}
+.ss-hint-body p{font-size:13px;color:var(--sec);line-height:1.55}
+kbd{background:var(--brd);border-radius:4px;padding:1px 5px;font-size:11.5px;
+  font-family:monospace;border:1px solid #bbb;white-space:nowrap}
+
+/* Screenshot area — clean white card for capturing */
+#screenshot-area{
+  background:var(--card);border-radius:var(--r);padding:28px;
+  box-shadow:var(--shlg);margin-bottom:24px;
+}
+.ss-clinic-hdr{display:flex;align-items:center;gap:14px;padding-bottom:16px;
+  border-bottom:2px solid var(--acc);margin-bottom:20px}
+.ss-logo{border:2px dashed var(--acc);border-radius:var(--rs);padding:6px 12px;
+  font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.5px}
+.ss-clinic-name{font-size:11px;color:var(--sec)}
+.ss-clinic-title{font-family:'Spectral',serif;font-size:17px;font-weight:700;line-height:1.2}
+.ss-report-title{font-family:'Spectral',serif;font-size:22px;font-weight:700;margin-bottom:4px}
+.ss-report-date{font-size:12px;color:var(--sec);margin-bottom:20px}
+.ss-row{display:flex;align-items:stretch;border-bottom:1px solid var(--brd);padding:12px 0;gap:16px}
+.ss-row:last-child{border-bottom:none}
+.ss-row-icon{font-size:22px;flex-shrink:0;display:flex;align-items:center;width:32px}
+.ss-row-main{flex:1;min-width:0}
+.ss-row-name{font-family:'Spectral',serif;font-size:15px;font-weight:700}
+.ss-row-full{font-size:10.5px;color:var(--sec);margin-bottom:6px}
+.ss-row-interp{font-size:12.5px;color:var(--sec);line-height:1.4;margin-top:5px}
+.ss-row-right{width:110px;flex-shrink:0;text-align:right}
+.ss-row-score{font-family:'Spectral',serif;font-size:26px;font-weight:700;line-height:1}
+.ss-row-max{font-size:11px;color:var(--sec)}
+.ss-row-btrack{height:4px;background:var(--brd);border-radius:2px;overflow:hidden;margin-top:6px}
+.ss-disclaimer{margin-top:16px;padding:10px 14px;background:rgba(59,110,165,.07);
+  border-radius:var(--rs);font-size:11px;color:var(--sec);line-height:1.5;border-left:3px solid var(--acc)}
+
+.sum-actions{display:flex;flex-direction:column;gap:9px}
+
+@media(max-width:640px){
+  .hdr,.thdr{padding:11px 14px}
+  .home-wrap{padding:26px 14px 160px}
+  .tgrid{grid-template-columns:1fr}
+  .qwrap{padding:26px 14px 90px}
+  .rwrap,.sum-wrap{padding:26px 14px 60px}
+  .score-big{font-size:40px}
+  .btn-next{position:fixed;bottom:0;left:0;right:0;border-radius:0;padding:16px;z-index:20}
+  #sbar{gap:8px}
+  .sum-card{grid-template-columns:32px 1fr 60px}
+  .ss-row{flex-wrap:wrap}
+  .ss-row-right{width:100%}
+  #screenshot-area{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ SCREEN 1 — HOME ═══ -->
+<div id="scr-home" class="screen active">
+  <div class="hdr">
+    <div class="logo">Логотип клиники</div>
+    <div class="hdr-t">Психиатрическая клиника</div>
+  </div>
+  <div class="home-wrap">
+    <div class="hero">
+      <h1>Онлайн-скрининг<br>психического здоровья</h1>
+      <p>Выберите тест для оценки вашего состояния. Результаты помогут врачу в диагностике.</p>
+    </div>
+    <div class="tgrid" id="tgrid"></div>
+  </div>
+  <div id="sbar">
+    <div class="spills" id="spills"></div>
+    <span style="font-size:13px;font-weight:600;color:var(--sec);white-space:nowrap;flex-shrink:0" id="scnt"></span>
+    <button id="btn-summary" style="background:var(--acc);color:#fff;border:none;border-radius:var(--rs);
+      padding:9px 16px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;flex-shrink:0">
+      📋 Сводка результатов
+    </button>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 2 — TEST ═══ -->
+<div id="scr-test" class="screen">
+  <div class="thdr">
+    <button id="btn-back" class="btn-ghost">← Назад</button>
+    <div><div class="thn" id="thn"></div><div class="thp" id="thp"></div></div>
+  </div>
+  <div class="pbar"><div class="pbar-f" id="pbarf" style="width:0%"></div></div>
+  <div class="qwrap" id="qwrap"></div>
+</div>
+
+<!-- ═══ SCREEN 3 — LOADING ═══ -->
+<div id="scr-load" class="screen">
+  <div class="spinner"></div>
+  <div class="ltxt">Обрабатываем ваши ответы…</div>
+</div>
+
+<!-- ═══ SCREEN 4 — RESULT ═══ -->
+<div id="scr-res" class="screen">
+  <div class="hdr">
+    <div class="logo">Логотип клиники</div>
+    <div class="hdr-t">Результат теста</div>
+  </div>
+  <div class="rwrap" id="rcont"></div>
+</div>
+
+<!-- ═══ SCREEN 5 — SUMMARY ═══ -->
+<div id="scr-sum" class="screen">
+  <div class="hdr">
+    <div class="logo">Логотип клиники</div>
+    <div class="hdr-t">Сводка результатов</div>
+  </div>
+  <div class="sum-wrap">
+    <div class="sum-title">Сводка результатов</div>
+    <div class="sum-date" id="sum-date"></div>
+
+    <!-- Hint -->
+    <div class="ss-hint">
+      <div class="ss-hint-icon">📸</div>
+      <div class="ss-hint-body">
+        <strong>Как сохранить результаты</strong>
+        <p>Нажмите кнопку <b>«Сохранить как изображение»</b> ниже — файл скачается автоматически.<br>
+        Или сделайте скриншот: <kbd>Win+Shift+S</kbd> (Windows) · <kbd>⌘+Shift+4</kbd> (Mac) · <kbd>Скриншот</kbd> (телефон)</p>
+      </div>
+    </div>
+
+    <!-- Clean area to screenshot / save -->
+    <div id="screenshot-area">
+      <div class="ss-clinic-hdr">
+        <div class="ss-logo">Логотип клиники</div>
+        <div>
+          <div class="ss-clinic-name">Психиатрическая клиника</div>
+          <div class="ss-clinic-title">Онлайн-скрининг психического здоровья</div>
+        </div>
+      </div>
+      <div class="ss-report-title">Результаты скрининга</div>
+      <div class="ss-report-date" id="ss-date"></div>
+      <div id="ss-rows"></div>
+      <div class="ss-disclaimer">
+        Результаты являются скрининговыми и не заменяют консультацию специалиста.
+        Обратитесь к лечащему врачу для интерпретации.
+      </div>
+    </div>
+
+    <div class="sum-actions">
+      <button class="btn-primary" id="btn-save-img">🖼 Сохранить как изображение</button>
+      <button class="btn-secondary" id="btn-back-home">← Пройти ещё тест</button>
+      <button class="btn-danger" id="btn-clear">🗑 Очистить все результаты</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   TEST DATA
+═══════════════════════════════════════════ */
+const TESTS={
+  phq9:{id:'phq9',name:'PHQ-9',fullName:'Опросник депрессии',icon:'😔',
+    desc:'Оценка симптомов депрессии за последние 2 недели',time:'~2 мин · 9 вопросов',
+    type:'likert4',max:27,
+    instr:'За последние 2 недели как часто вас беспокоили следующие проблемы?',
+    opts:[{l:'Ни разу',v:0},{l:'Несколько дней',v:1},{l:'Более половины дней',v:2},{l:'Почти каждый день',v:3}],
+    qs:['Слабый интерес или удовольствие от занятий',
+        'Подавленное настроение, депрессия или чувство безнадёжности',
+        'Проблемы с засыпанием, сном или излишняя сонливость',
+        'Усталость или недостаток энергии',
+        'Плохой аппетит или переедание',
+        'Плохое мнение о себе, ощущение никчёмности или вины',
+        'Трудности с концентрацией при чтении, просмотре ТВ и т.д.',
+        'Замедленные движения или речь (заметно окружающим) или наоборот — суетливость',
+        'Мысли о том, что лучше было бы умереть или причинить себе вред'],
+    ranges:[
+      {max:4,label:'Минимальная депрессия',col:'g',interp:'Симптомы депрессии минимальны или отсутствуют.',rec:'Продолжайте следить за своим состоянием. При изменении самочувствия обратитесь к врачу.'},
+      {max:9,label:'Лёгкая депрессия',col:'y',interp:'Лёгкие симптомы депрессии.',rec:'Обсудите результаты с врачом, обратите внимание на режим сна и отдыха.'},
+      {max:14,label:'Умеренная депрессия',col:'o',interp:'Умеренная депрессия.',rec:'Рекомендуется консультация психиатра или психотерапевта.'},
+      {max:19,label:'Средне-тяжёлая депрессия',col:'r',interp:'Средне-тяжёлая депрессия.',rec:'Необходима консультация психиатра. Сообщите о симптомах врачу сегодня.'},
+      {max:27,label:'Тяжёлая депрессия',col:'r',interp:'Тяжёлая депрессия.',rec:'Срочно обратитесь к психиатру.'}]},
+  gad7:{id:'gad7',name:'GAD-7',fullName:'Опросник тревоги',icon:'💓',
+    desc:'Оценка уровня тревожности за последние 2 недели',time:'~2 мин · 7 вопросов',
+    type:'likert4',max:21,
+    instr:'За последние 2 недели как часто вас беспокоили следующие проблемы?',
+    opts:[{l:'Ни разу',v:0},{l:'Несколько дней',v:1},{l:'Более половины дней',v:2},{l:'Почти каждый день',v:3}],
+    qs:['Чувство нервозности, тревоги или напряжения',
+        'Неспособность остановить или контролировать беспокойство',
+        'Слишком сильное беспокойство по разным поводам',
+        'Трудности с расслаблением',
+        'Такое беспокойство, что трудно усидеть на месте',
+        'Раздражительность',
+        'Чувство страха, как будто что-то ужасное может случиться'],
+    ranges:[
+      {max:4,label:'Минимальная тревога',col:'g',interp:'Симптомы тревоги минимальны или отсутствуют.',rec:'Продолжайте следить за состоянием. Обратитесь к врачу при ухудшении.'},
+      {max:9,label:'Лёгкая тревога',col:'y',interp:'Лёгкая тревога.',rec:'Обсудите результаты с врачом. Помогут техники релаксации.'},
+      {max:14,label:'Умеренная тревога',col:'o',interp:'Умеренная тревога.',rec:'Рекомендуется консультация психиатра или психотерапевта.'},
+      {max:21,label:'Тяжёлая тревога',col:'r',interp:'Тяжёлая тревога.',rec:'Необходима консультация психиатра.'}]},
+  mdq:{id:'mdq',name:'MDQ',fullName:'Скрининг биполярного расстройства',icon:'📈',
+    desc:'Выявление признаков биполярного расстройства',time:'~3 мин · 15 вопросов',
+    type:'mdq',max:13,
+    instr:'Вспомните период, когда вы чувствовали себя необычно приподнято, взволнованно или активно.',
+    qs:[
+      {t:'Вы чувствовали себя настолько хорошо или гиперактивно, что окружающие считали, что вы не в себе?',p:1},
+      {t:'Вы были настолько раздражительны, что кричали на людей или начинали драки?',p:1},
+      {t:'Вы чувствовали себя более уверенно, чем обычно?',p:1},
+      {t:'Вы спали гораздо меньше обычного и не чувствовали усталости?',p:1},
+      {t:'Вы были более разговорчивы или говорили быстрее, чем обычно?',p:1},
+      {t:'Мысли мчались в вашей голове или вы не могли замедлить свой ум?',p:1},
+      {t:'Вас так легко отвлекали вещи вокруг, что было трудно сконцентрироваться?',p:1},
+      {t:'У вас было больше энергии, чем обычно?',p:1},
+      {t:'Вы были намного активнее или делали больше вещей, чем обычно?',p:1},
+      {t:'Вы были более общительны или разговорчивы, чем обычно?',p:1},
+      {t:'Вы были более заинтересованы в сексе, чем обычно?',p:1},
+      {t:'Вы делали вещи, необычные для вас, или которые другие могли счесть рискованными?',p:1},
+      {t:'Траты денег привели вас или вашу семью в затруднительное положение?',p:1},
+      {t:'Произошло ли несколько из этих симптомов одновременно?',p:2},
+      {t:'Насколько эти проблемы мешали вашей работе, семье или социальным отношениям?',p:3,
+       opts:[{l:'Нет проблем',v:0},{l:'Небольшие проблемы',v:1},{l:'Умеренные проблемы',v:2},{l:'Серьёзные проблемы',v:3}]}]},
+  audit:{id:'audit',name:'AUDIT',fullName:'Тест на алкогольную зависимость',icon:'🔔',
+    desc:'Оценка употребления алкоголя и рисков',time:'~2 мин · 10 вопросов',
+    type:'audit',max:40,
+    instr:'Ответьте на вопросы о вашем употреблении алкоголя.',
+    qs:[
+      {t:'Как часто вы употребляете алкоголь?',opts:[{l:'Никогда',v:0},{l:'Раз в месяц или реже',v:1},{l:'2–4 раза в месяц',v:2},{l:'2–3 раза в неделю',v:3},{l:'4 или более раз в неделю',v:4}]},
+      {t:'Сколько порций в типичный день? (1 порция = 10 г алкоголя)',opts:[{l:'1–2',v:0},{l:'3–4',v:1},{l:'5–6',v:2},{l:'7–9',v:3},{l:'10 или более',v:4}]},
+      {t:'Как часто вы выпиваете 6 или более порций за раз?',opts:[{l:'Никогда',v:0},{l:'Реже раза в месяц',v:1},{l:'Раз в месяц',v:2},{l:'Раз в неделю',v:3},{l:'Ежедневно или почти ежедневно',v:4}]},
+      {t:'Как часто вы не могли остановиться, начав пить?',opts:[{l:'Никогда',v:0},{l:'Реже раза в месяц',v:1},{l:'Раз в месяц',v:2},{l:'Раз в неделю',v:3},{l:'Ежедневно или почти ежедневно',v:4}]},
+      {t:'Как часто из-за выпивки вы не делали то, что от вас ожидалось?',opts:[{l:'Никогда',v:0},{l:'Реже раза в месяц',v:1},{l:'Раз в месяц',v:2},{l:'Раз в неделю',v:3},{l:'Ежедневно или почти ежедневно',v:4}]},
+      {t:'Как часто вам нужно было выпить с утра, чтобы прийти в себя?',opts:[{l:'Никогда',v:0},{l:'Реже раза в месяц',v:1},{l:'Раз в месяц',v:2},{l:'Раз в неделю',v:3},{l:'Ежедневно или почти ежедневно',v:4}]},
+      {t:'Как часто вы испытывали чувство вины после выпивки?',opts:[{l:'Никогда',v:0},{l:'Реже раза в месяц',v:1},{l:'Раз в месяц',v:2},{l:'Раз в неделю',v:3},{l:'Ежедневно или почти ежедневно',v:4}]},
+      {t:'Как часто вы не могли вспомнить, что было накануне из-за выпивки?',opts:[{l:'Никогда',v:0},{l:'Реже раза в месяц',v:1},{l:'Раз в месяц',v:2},{l:'Раз в неделю',v:3},{l:'Ежедневно или почти ежедневно',v:4}]},
+      {t:'Вы или кто-то другой получали травму из-за вашего употребления алкоголя?',opts:[{l:'Нет',v:0},{l:'Да, но не в последний год',v:2},{l:'Да, в последний год',v:4}]},
+      {t:'Родственник, друг или врач советовали сократить употребление алкоголя?',opts:[{l:'Нет',v:0},{l:'Да, но не в последний год',v:2},{l:'Да, в последний год',v:4}]}],
+    ranges:[
+      {max:7,label:'Низкий риск',col:'g',interp:'Употребление алкоголя в пределах низкого риска.',rec:'Придерживайтесь умеренного потребления алкоголя.'},
+      {max:15,label:'Рискованное употребление',col:'y',interp:'Рискованное употребление алкоголя.',rec:'Рекомендуется снизить потребление и обсудить с врачом.'},
+      {max:19,label:'Вредное употребление',col:'o',interp:'Вредное употребление алкоголя.',rec:'Необходима консультация нарколога или психиатра.'},
+      {max:40,label:'Возможная зависимость',col:'r',interp:'Признаки возможной алкогольной зависимости.',rec:'Обратитесь к наркологу или психиатру как можно скорее.'}]},
+  pss10:{id:'pss10',name:'PSS-10',fullName:'Шкала воспринимаемого стресса',icon:'⚡',
+    desc:'Оценка уровня стресса за последний месяц',time:'~2 мин · 10 вопросов',
+    type:'pss10',max:40,
+    instr:'За последний месяц как часто вы переживали следующее?',
+    opts:[{l:'Никогда',v:0},{l:'Почти никогда',v:1},{l:'Иногда',v:2},{l:'Довольно часто',v:3},{l:'Очень часто',v:4}],
+    qs:[{t:'Были расстроены из-за неожиданного события',rev:false},
+        {t:'Чувствовали, что не можете контролировать важные вещи в вашей жизни',rev:false},
+        {t:'Чувствовали нервозность и стресс',rev:false},
+        {t:'Успешно справлялись с повседневными проблемами и неприятностями',rev:true},
+        {t:'Эффективно справлялись с важными изменениями в вашей жизни',rev:true},
+        {t:'Чувствовали уверенность в способности решать личные проблемы',rev:true},
+        {t:'Чувствовали, что всё идёт по плану',rev:true},
+        {t:'Не могли справиться со всеми делами, которые нужно было сделать',rev:false},
+        {t:'Могли контролировать раздражение',rev:true},
+        {t:'Чувствовали, что всё навалилось и вы не справляетесь',rev:false}],
+    ranges:[
+      {max:13,label:'Низкий уровень стресса',col:'g',interp:'Низкий уровень воспринимаемого стресса.',rec:'Продолжайте поддерживать здоровый образ жизни.'},
+      {max:26,label:'Умеренный уровень стресса',col:'y',interp:'Умеренный уровень стресса.',rec:'Обсудите результаты с врачом. Полезны техники релаксации.'},
+      {max:40,label:'Высокий уровень стресса',col:'r',interp:'Высокий уровень стресса.',rec:'Рекомендуется консультация психиатра или психотерапевта.'}]},
+};
+
+/* ─── COLOR MAP ─── */
+const CM={
+  g:{text:'#2D7D46',bg:'#EAF5EE',brd:'rgba(45,125,70,.25)'},
+  y:{text:'#C07C1A',bg:'#FEF6E4',brd:'rgba(192,124,26,.25)'},
+  o:{text:'#C25B1C',bg:'#FEF0E6',brd:'rgba(194,91,28,.25)'},
+  r:{text:'#B52C2C',bg:'#FDEAEA',brd:'rgba(181,44,44,.25)'},
+};
+
+/* ─── STATE ─── */
+let CT=null, QI=0, ANS=[], SV=null;
+const SAV={};
+
+/* ─── ROUTING ─── */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.documentElement.scrollTop=0; document.body.scrollTop=0;
+}
+
+/* ─── INIT ─── */
+function init(){
+  const g=document.getElementById('tgrid');
+  Object.values(TESTS).forEach(t=>{
+    const c=document.createElement('div');
+    c.className='tc'; c.id='tc-'+t.id; c.tabIndex=0;
+    c.innerHTML=`<div class="tc-top"><span class="tc-icon">${t.icon}</span>
+      <button class="tc-redo" id="redo-${t.id}">↺ Заново</button></div>
+      <div class="tc-name">${t.name}</div>
+      <div class="tc-full">${t.fullName}</div>
+      <div class="tc-desc">${t.desc}</div>
+      <div class="tc-meta">⏱ ${t.time}</div>
+      <div class="tc-inlay" id="inlay-${t.id}"></div>`;
+    c.addEventListener('click', e=>{
+      if(e.target.closest('.tc-redo')){ startTest(t.id); return; }
+      if(!c.classList.contains('done')) startTest(t.id);
+    });
+    c.addEventListener('keydown', e=>{
+      if((e.key==='Enter'||e.key===' ')&&!c.classList.contains('done')){e.preventDefault();startTest(t.id);}
+    });
+    g.appendChild(c);
+  });
+
+  document.getElementById('btn-summary').addEventListener('click', showSummary);
+  document.getElementById('btn-back').addEventListener('click', goHome);
+  document.getElementById('btn-back-home').addEventListener('click', goHome);
+  document.getElementById('btn-save-img').addEventListener('click', saveImage);
+  document.getElementById('btn-clear').addEventListener('click', ()=>{
+    Object.keys(SAV).forEach(k=>{delete SAV[k]; updateCard(k);});
+    goHome();
+  });
+}
+
+/* ─── CARD UPDATE ─── */
+function colName(col){ return {g:'g',y:'y',o:'o',r:'r'}[col]||'r'; }
+function updateCard(id){
+  const card=document.getElementById('tc-'+id);
+  const inlay=document.getElementById('inlay-'+id);
+  const r=SAV[id];
+  ['bdr-g','bdr-y','bdr-o','bdr-r'].forEach(c=>card.classList.remove(c));
+  if(!r){ card.classList.remove('done'); inlay.innerHTML=''; updateBar(); return; }
+  const col=colName(r.col), cl=CM[col];
+  card.classList.add('done','bdr-'+col);
+  card.style.borderColor=cl.brd;
+  const pct=Math.round((r.score/r.max)*100);
+  inlay.innerHTML=`
+    <div class="inlay-row">
+      <div><div class="inlay-sc c-${col}">${r.score}</div><div class="inlay-mx">из ${r.max}</div></div>
+      <div class="badge ba-${col}"><span class="bdot d-${col}"></span>${r.label}</div>
+    </div>
+    <div class="inlay-int">${r.interp}</div>
+    <div class="btrack"><div class="bfill f-${col}" style="width:${pct}%"></div></div>`;
+  updateBar();
+}
+
+function updateBar(){
+  const res=Object.values(SAV), bar=document.getElementById('sbar');
+  if(!res.length){ bar.classList.remove('on'); return; }
+  bar.classList.add('on');
+  document.getElementById('scnt').textContent='Пройдено: '+res.length+' из 5';
+  document.getElementById('spills').innerHTML=res.map(r=>{
+    const col=colName(r.col);
+    return `<span class="spill ba-${col}"><span class="spilld d-${col}"></span>${r.testName} ${r.score}/${r.max}</span>`;
+  }).join('');
+}
+
+/* ─── NAV ─── */
+function goHome(){ CT=null;QI=0;ANS=[];SV=null; show('scr-home'); }
+
+/* ─── TEST FLOW ─── */
+function startTest(id){
+  CT=TESTS[id]; QI=0; ANS=[]; SV=null;
+  document.getElementById('thn').textContent=CT.name+' — '+CT.fullName;
+  show('scr-test'); renderQ();
+}
+function getQs(){ return CT.qs; }
+function renderQ(){
+  const t=CT, qs=getQs(), tot=qs.length, q=qs[QI];
+  SV=null;
+  document.getElementById('pbarf').style.width=Math.round((QI/tot)*100)+'%';
+  document.getElementById('thp').textContent=`Вопрос ${QI+1} из ${tot}`;
+  let h='';
+  if(QI===0&&t.instr) h+=`<div class="q-instr">${t.instr}</div>`;
+  if(t.type==='mdq'){
+    const nm={1:'Часть 1 — Симптомы',2:'Часть 2',3:'Часть 3 — Степень влияния'};
+    const prev=QI>0?qs[QI-1]:null;
+    if(!prev||prev.p!==q.p) h+=`<div class="q-part">${nm[q.p]}</div>`;
+  }
+  h+=`<div class="q-num">Вопрос ${QI+1} из ${tot}</div>`;
+  const qt=(t.type==='mdq'||t.type==='audit')?q.t:(typeof q==='string'?q:q.t);
+  h+=`<div class="q-txt">${qt}${t.type==='pss10'&&q.rev?'<span class="rev-tag">обратный</span>':''}</div>`;
+  let opts;
+  if(t.type==='likert4'||t.type==='pss10') opts=t.opts;
+  else if(t.type==='audit') opts=q.opts;
+  else opts=(q.p===1||q.p===2)?[{l:'Да',v:1},{l:'Нет',v:0}]:q.opts;
+  const bin=(t.type==='mdq'&&(q.p===1||q.p===2));
+  h+=`<div class="opts${bin?' bin':''}" id="olist">`;
+  opts.forEach(o=>{
+    const dot=bin?'':`<span class="odot"></span>`;
+    h+=`<button class="opt" data-v="${o.v}">${dot}<span>${o.l}</span></button>`;
+  });
+  h+=`</div><button class="btn-next" id="bnxt">${QI===tot-1?'Завершить тест ✓':'Далее →'}</button>`;
+  const w=document.getElementById('qwrap');
+  w.innerHTML=h; w.classList.remove('aq'); void w.offsetWidth; w.classList.add('aq');
+  w.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>pickOpt(b,+b.dataset.v)));
+  document.getElementById('bnxt').addEventListener('click', nextQ);
+}
+function pickOpt(btn,v){
+  document.querySelectorAll('#olist .opt').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel'); SV=v;
+  const nb=document.getElementById('bnxt');
+  if(nb){ nb.classList.add('on'); nb.style.animation='none'; void nb.offsetWidth; nb.style.animation=''; }
+}
+function nextQ(){
+  if(SV===null) return;
+  ANS.push(SV); QI++;
+  if(QI>=getQs().length){ finishTest(); return; }
+  renderQ();
+}
+function finishTest(){
+  show('scr-load');
+  setTimeout(()=>{ const r=calcResult(); SAV[r.testId]=r; updateCard(r.testId); renderResult(r); show('scr-res'); }, 650+Math.random()*400);
+}
+
+/* ─── CALC ─── */
+function calcResult(){
+  const t=CT, now=new Date();
+  const ds=now.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'})+', '+now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  let score, range;
+  if(t.type==='likert4'||t.type==='audit'){ score=ANS.reduce((a,b)=>a+b,0); range=getRange(t,score); }
+  else if(t.type==='pss10'){ score=0; t.qs.forEach((q,i)=>{ score+=q.rev?(4-ANS[i]):ANS[i]; }); range=getRange(t,score); }
+  else{
+    const p1=ANS.slice(0,13).reduce((a,b)=>a+b,0), p2=ANS[13]===1, p3=ANS[14], pos=p1>=7&&p2&&p3>=2;
+    score=p1;
+    range={label:pos?'Положительный скрининг':'Отрицательный скрининг',col:pos?'r':'g',
+      interp:pos?'Результаты указывают на возможное биполярное расстройство.':'Скрининг не выявил признаков биполярного расстройства.',
+      rec:pos?'Необходима консультация психиатра.':'При беспокойстве обратитесь к специалисту.'};
+  }
+  return {testId:t.id,testName:t.name,fullName:t.fullName,icon:t.icon,score,max:t.max,date:ds,
+    label:range.label,col:range.col,interp:range.interp,rec:range.rec};
+}
+function getRange(t,s){ for(const r of t.ranges) if(s<=r.max) return r; return t.ranges[t.ranges.length-1]; }
+
+/* ─── RESULT SCREEN ─── */
+function renderResult(r){
+  const pct=Math.round((r.score/r.max)*100), col=colName(r.col), cl=CM[col];
+  document.getElementById('rcont').innerHTML=`
+    <div class="r-name">${r.testName} — ${r.fullName}</div>
+    <div class="r-date">Пройден: ${r.date}</div>
+    <div class="score-card">
+      <div class="score-lbl">Ваш результат</div>
+      <div class="score-big c-${col}">${r.score}<span> / ${r.max}</span></div>
+      <div class="bar-t"><div class="bar-f f-${col}" id="rbarf" style="width:0%"></div></div>
+      <div class="bar-ends"><span>0</span><span>${r.max}</span></div>
+      <div class="sev-badge ba-${col}"><span class="sev-dot d-${col}"></span>${r.label}</div>
+    </div>
+    <div class="interp-card bg-${col}">
+      <h3 class="c-${col}">Интерпретация</h3><p>${r.interp}</p>
+    </div>
+    <div class="rec-card"><strong>Рекомендации</strong>${r.rec}</div>
+    <div class="act-col">
+      <button class="btn-primary" id="r-to-sum">📋 Смотреть сводку результатов</button>
+      <button class="btn-secondary" id="r-to-home">← Пройти другой тест</button>
+      <button class="btn-danger" id="r-del">✕ Не сохранять этот результат</button>
+    </div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const b=document.getElementById('rbarf'); if(b) b.style.width=pct+'%';
+  }));
+  document.getElementById('r-to-sum').addEventListener('click', showSummary);
+  document.getElementById('r-to-home').addEventListener('click', goHome);
+  document.getElementById('r-del').addEventListener('click', ()=>{ delete SAV[r.testId]; updateCard(r.testId); goHome(); });
+}
+
+/* ─── SUMMARY SCREEN ─── */
+function showSummary(){
+  const results=Object.values(SAV);
+  if(!results.length){ goHome(); return; }
+  const now=new Date();
+  const ds=now.toLocaleDateString('ru-RU',{day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('sum-date').textContent=ds+' · Пройдено тестов: '+results.length+' из 5';
+  document.getElementById('ss-date').textContent='Дата: '+ds+' · Пройдено: '+results.length+' из 5 тестов';
+
+  // Rows inside screenshot area
+  document.getElementById('ss-rows').innerHTML=results.map(r=>{
+    const col=colName(r.col), cl=CM[col];
+    const pct=Math.round((r.score/r.max)*100);
+    return `<div class="ss-row">
+      <div class="ss-row-icon">${r.icon}</div>
+      <div class="ss-row-main">
+        <div class="ss-row-name">${r.testName}</div>
+        <div class="ss-row-full">${r.fullName}</div>
+        <div class="badge ba-${col}" style="margin-bottom:4px"><span class="bdot d-${col}"></span>${r.label}</div>
+        <div class="ss-row-interp">${r.interp}</div>
+      </div>
+      <div class="ss-row-right">
+        <div class="ss-row-score c-${col}">${r.score}</div>
+        <div class="ss-row-max">из ${r.max}</div>
+        <div class="ss-row-btrack"><div class="bfill f-${col}" style="width:${pct}%"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  show('scr-sum');
+}
+
+/* ─── SAVE AS IMAGE via Canvas ─── */
+function saveImage(){
+  const el=document.getElementById('screenshot-area');
+  const btn=document.getElementById('btn-save-img');
+  btn.textContent='⏳ Создаём изображение…';
+  btn.disabled=true;
+
+  // Use html2canvas if available (loaded from CDN), else fallback message
+  if(typeof html2canvas==='undefined'){
+    btn.textContent='🖼 Сохранить как изображение';
+    btn.disabled=false;
+    // Graceful fallback: instruct screenshot
+    const tip=document.createElement('div');
+    tip.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1A2332;color:#fff;padding:10px 20px;border-radius:100px;font-size:13px;z-index:999;white-space:nowrap';
+    tip.textContent='Библиотека не загружена. Сделайте скриншот вручную.';
+    document.body.appendChild(tip);
+    setTimeout(()=>document.body.removeChild(tip),3500);
+    return;
+  }
+
+  html2canvas(el, {
+    scale:2, backgroundColor:'#FDFCFA', useCORS:true, logging:false,
+    onclone: doc => {
+      // Ensure bars are rendered at their actual width
+      doc.querySelectorAll('.bfill').forEach(b=>{ b.style.transition='none'; });
+    }
+  }).then(canvas=>{
+    const link=document.createElement('a');
+    link.download='Скрининг_'+new Date().toLocaleDateString('ru-RU').replace(/\./g,'-')+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    btn.textContent='🖼 Сохранить как изображение';
+    btn.disabled=false;
+  }).catch(()=>{
+    btn.textContent='🖼 Сохранить как изображение';
+    btn.disabled=false;
+  });
+}
+
+/* ─── BOOT ─── */
+init();
+</script>
+
+<!-- html2canvas for image export — loads async, graceful fallback if blocked -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" async></script>
+</body>
+</html>
