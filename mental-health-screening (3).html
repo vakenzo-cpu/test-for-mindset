@@ -263,7 +263,43 @@ kbd{background:var(--brd);border-radius:4px;padding:1px 5px;font-size:11.5px;
   .ss-row{flex-wrap:wrap}
   .ss-row-right{width:100%}
   #screenshot-area{padding:18px}
+  .disc-box{padding:24px 18px 20px}
+  .disc-title{font-size:18px}
 }
+
+/* ── DISCLAIMER MODAL ── */
+.disc-overlay{position:fixed;inset:0;z-index:500;background:rgba(26,35,50,.6);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  animation:fadeIn .25s ease both}
+.disc-overlay.hidden{display:none}
+.disc-box{background:var(--card);border-radius:var(--r);max-width:470px;width:100%;
+  box-shadow:0 16px 48px rgba(0,0,0,.18),0 4px 16px rgba(0,0,0,.1);
+  padding:32px 28px 24px;position:relative;
+  animation:fadeIn .3s ease both}
+.disc-close-x{position:absolute;top:13px;right:15px;background:none;border:none;
+  font-size:18px;color:var(--sec);cursor:pointer;padding:4px 8px;
+  border-radius:6px;line-height:1;font-family:inherit;transition:all .13s}
+.disc-close-x:hover{background:var(--brd);color:var(--txt)}
+.disc-icon{font-size:38px;margin-bottom:14px;display:block;line-height:1}
+.disc-title{font-family:'Spectral',serif;font-size:21px;font-weight:700;
+  line-height:1.3;margin-bottom:12px;color:var(--txt)}
+.disc-body{font-size:14px;color:var(--sec);line-height:1.75;margin-bottom:22px}
+.disc-body strong{color:var(--txt);font-weight:600}
+.disc-list{list-style:none;padding:0;margin-top:10px;display:flex;flex-direction:column;gap:9px}
+.disc-list li{display:flex;gap:10px;align-items:flex-start}
+.disc-list li::before{content:'';flex-shrink:0;width:5px;height:5px;border-radius:50%;
+  background:var(--acc);margin-top:7px}
+.disc-ack{background:var(--acc);color:#fff;border:none;border-radius:var(--rs);
+  padding:13px 20px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;
+  width:100%;transition:background .15s}
+.disc-ack:hover{background:var(--adk)}
+.disc-note{font-size:11.5px;color:var(--sec);text-align:center;margin-top:10px;line-height:1.5}
+.btn-info{background:none;border:1.5px solid var(--brd);color:var(--sec);
+  padding:5px 11px;font-size:12.5px;font-weight:500;font-family:inherit;cursor:pointer;
+  border-radius:var(--rs);transition:all .15s;white-space:nowrap;flex-shrink:0;
+  display:inline-flex;align-items:center;gap:5px}
+.btn-info:hover{border-color:var(--acc);color:var(--acc)}
 </style>
 </head>
 <body>
@@ -273,6 +309,7 @@ kbd{background:var(--brd);border-radius:4px;padding:1px 5px;font-size:11.5px;
   <div class="hdr">
     <div class="logo">Логотип клиники</div>
     <div class="hdr-t">Психиатрическая клиника</div>
+    <button class="btn-info" id="btn-disc-info">ℹ️ О скрининге</button>
   </div>
   <div class="home-wrap">
     <div class="hero">
@@ -359,6 +396,25 @@ kbd{background:var(--brd);border-radius:4px;padding:1px 5px;font-size:11.5px;
       <button class="btn-secondary" id="btn-back-home">← Пройти ещё тест</button>
       <button class="btn-danger" id="btn-clear">🗑 Очистить все результаты</button>
     </div>
+  </div>
+</div>
+
+<!-- ═══ DISCLAIMER MODAL ═══ -->
+<div id="disc-modal" class="disc-overlay" role="dialog" aria-modal="true" aria-labelledby="disc-title">
+  <div class="disc-box">
+    <button class="disc-close-x" id="disc-close-x" aria-label="Закрыть">✕</button>
+    <span class="disc-icon">⚕️</span>
+    <div class="disc-title" id="disc-title">Перед началом — важная информация</div>
+    <div class="disc-body">
+      <strong>Результаты тестов не являются медицинским диагнозом.</strong>
+      <ul class="disc-list">
+        <li>Скрининг носит <strong>вспомогательный характер</strong> и помогает предварительно оценить ваше состояние.</li>
+        <li>Интерпретация результатов требует учёта индивидуальных факторов — это задача врача при очной консультации.</li>
+        <li>При любом беспокойстве о своём психическом здоровье <strong>обратитесь к специалисту</strong> — психиатру или психотерапевту.</li>
+      </ul>
+    </div>
+    <button class="disc-ack" id="disc-ack">Понятно, начать скрининг →</button>
+    <div class="disc-note">Нажимая кнопку, вы подтверждаете, что ознакомились с данной информацией.</div>
   </div>
 </div>
 
@@ -728,6 +784,17 @@ function saveImage(){
     btn.disabled=false;
   });
 }
+
+/* ─── DISCLAIMER MODAL ─── */
+(function(){
+  const overlay=document.getElementById('disc-modal');
+  const close=()=>overlay.classList.add('hidden');
+  document.getElementById('disc-ack').addEventListener('click', close);
+  document.getElementById('disc-close-x').addEventListener('click', close);
+  document.getElementById('btn-disc-info').addEventListener('click', ()=>overlay.classList.remove('hidden'));
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) close(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape'&&!overlay.classList.contains('hidden')) close(); });
+})();
 
 /* ─── BOOT ─── */
 init();
